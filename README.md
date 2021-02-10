@@ -1,5 +1,11 @@
-# node-js-template
+# GraphQL Federation Demo
 
-Template to quickly start node-js projects.
+Features:
 
-Pre-Configured ESLint + Prettier
+- Apollo Server with Federation
+- Services:
+  - Gateway
+  - Movies
+  - Actors
+
+Inspired by: https://github.com/apollographql/federation-demo
