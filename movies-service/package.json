@@ -1,12 +1,12 @@
 {
-  "name": "node-js-template",
+  "name": "movies-service",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/phartenfeller/node-js-template.git",
-  "author": "phartenfeller",
   "license": "MIT",
-  "scripts": {
-    "start": "node index.js"
+  "dependencies": {
+    "@apollo/federation": "^0.21.0",
+    "apollo-server": "^2.20.0",
+    "sqlite3": "^5.0.1"
   },
   "devDependencies": {
     "eslint": "^7.18.0",
@@ -15,10 +15,5 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.1",
     "prettier": "^2.2.1"
-  },
-  "dependencies": {
-    "@apollo/federation": "^0.21.0",
-    "apollo-server": "^2.19.2",
-    "sqlite3": "^5.0.1"
   }
 }

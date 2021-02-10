@@ -41,7 +41,7 @@ const getActorsByName = async (name) => {
                     , a.name as name
                     , a.gender as gender
                  from actors a
-                where a.name like ?
+                where lower(a.name) like ?
              `;
 
   const rows = await db.queryRows(sql, [`%${name.toLowerCase()}%`]);
