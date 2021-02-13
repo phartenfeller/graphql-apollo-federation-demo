@@ -4,6 +4,7 @@ const {
   getActorRoles,
   getActorById,
   getActorsByName,
+  getMovieCast,
 } = require('./dbApi');
 
 const typeDefs = gql`
@@ -16,10 +17,16 @@ const typeDefs = gql`
 
   type Role {
     role: String
-    movieId: ID!
+    movie: Movie
+    actor: Actor
   }
 
-  type Query {
+  extend type Movie @key(fields: "movieId") {
+    movieId: ID! @external
+    cast: [Role]
+  }
+
+  extend type Query {
     allActors: [Actor]
     actor(actorId: ID!): Actor
     actors(name: String!): [Actor]
@@ -39,9 +46,14 @@ const resolvers = {
     },
   },
   Actor: {
-    roles(parent) {
-      return getActorRoles(parent.actorId);
-    },
+    roles: (actor) => getActorRoles(actor.actorId),
+  },
+  Role: {
+    movie: (role) => ({ __typename: 'Movie', movieId: role.movieId }),
+    actor: (role) => getActorById(role.actorId),
+  },
+  Movie: {
+    cast: (movie) => getMovieCast(movie.movieId),
   },
 };
 

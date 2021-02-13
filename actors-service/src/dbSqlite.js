@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const data = require('../../data/actors.json');
+const actors = require('../../src_data/actors.json');
+const cast = require('../../src_data/cast.json');
 
 const DB_NAME = 'actors.sqlite';
 
@@ -106,6 +107,7 @@ class Db {
       st.finalize((err) => {
         if (err) {
           this.db.run('ROLLBACK TRANSACTION');
+          console.err(err);
           reject(err);
         }
         this.db.run('COMMIT TRANSACTION');
@@ -121,21 +123,26 @@ class Db {
     if (row.cnt === 0) {
       console.log('No data found, populating tables...');
 
-      const actors = [];
-      const actorMovies = [];
+      const actorArr = [];
+      const rolesArr = [];
+      const actorIds = [];
 
-      data.forEach(({ personId, name, gender, movies }) => {
-        actors.push([personId, name, gender]);
-        movies.forEach(({ role, movieId }) => {
-          actorMovies.push([personId, movieId, role]);
-        });
+      actors.forEach(({ actorId, name, gender }) => {
+        if (actorIds.indexOf(actorId) !== -1)
+          console.log('duplicate:', actorId);
+        actorArr.push([actorId, name, gender]);
+      });
+
+      cast.forEach(({ actorId, movieId, role }) => {
+        actorIds.push(actorId);
+        rolesArr.push([actorId, movieId, role || '-']);
       });
 
       const insert1 = `INSERT INTO actors (actor_id, name, gender) values (?, ?, ?)`;
-      await this.insertRows(insert1, actors);
+      await this.insertRows(insert1, actorArr);
 
       const insert2 = `INSERT INTO movie_roles (actor_id, movie_id, role) values (?, ?, ?)`;
-      await this.insertRows(insert2, actorMovies);
+      await this.insertRows(insert2, rolesArr);
 
       console.log('Finished populating data...');
     } else {
@@ -151,6 +158,7 @@ class Db {
     await this.runStatement('PRAGMA count_changes=OFF');
     await this.runStatement('PRAGMA journal_mode=MEMORY');
     await this.runStatement('PRAGMA temp_store=MEMORY');
+    await this.runStatement('PRAGMA cache_size=-64000');
 
     await this.initTables();
     await this.fillData();

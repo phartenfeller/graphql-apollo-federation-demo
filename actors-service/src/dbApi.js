@@ -27,6 +27,7 @@ const getActorById = async (actorId) => {
 
 const getActorRoles = async (actorId) => {
   const sql = `select m.role as role
+                    , m.actor_id as actorId
                     , m.movie_id as movieId
                  from movie_roles m
                 where actor_id = ?
@@ -48,4 +49,22 @@ const getActorsByName = async (name) => {
   return rows;
 };
 
-module.exports = { getAllActors, getActorRoles, getActorById, getActorsByName };
+const getMovieCast = async (movieId) => {
+  const sql = `select m.role as role
+                    , m.actor_id as actorId
+                    , m.movie_id as movieId
+                 from movie_roles m
+                where movie_id = ?
+              `;
+
+  const rows = await db.queryRows(sql, [movieId]);
+  return rows;
+};
+
+module.exports = {
+  getAllActors,
+  getActorRoles,
+  getActorById,
+  getActorsByName,
+  getMovieCast,
+};

@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const data = require('../../data/movies.json');
+const movies = require('../../src_data/movies.json');
 
 const DB_NAME = 'movies.sqlite';
 
@@ -107,14 +107,14 @@ class Db {
     if (row.cnt === 0) {
       console.log('No data found, populating tables...');
 
-      const movies = [];
+      const moviesArr = [];
 
-      data.forEach(({ movieId, title, year, runtime, descr }) => {
-        movies.push([movieId, title, year, runtime, descr]);
+      movies.forEach(({ movieId, title, year, runtime, description }) => {
+        moviesArr.push([movieId, title, year, runtime, description]);
       });
 
       const insert = `INSERT INTO movies (movie_id, title, year, runtime, description) values (?, ?, ?, ?, ?)`;
-      await this.insertRows(insert, movies);
+      await this.insertRows(insert, moviesArr);
 
       console.log('Finished populating data...');
     } else {
@@ -130,6 +130,7 @@ class Db {
     await this.runStatement('PRAGMA count_changes=OFF');
     await this.runStatement('PRAGMA journal_mode=MEMORY');
     await this.runStatement('PRAGMA temp_store=MEMORY');
+    await this.runStatement('PRAGMA cache_size=-64000');
 
     await this.initTables();
     await this.fillData();
